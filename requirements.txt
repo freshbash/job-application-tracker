@@ -1,0 +1,7 @@
+chromedriver-py
+Django==4.1
+django-oauth-toolkit
+oauthlib
+psycopg2-binary==2.9.6
+python-dotenv
+selenium
