@@ -4,8 +4,7 @@
   "description": "Front-end for the application tracker",
   "main": "webpack.config.js",
   "scripts": {
-    "build": "webpack --development",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "webpack --development"    
   },
   "keywords": [
     "frontend",
