@@ -1,8 +1,21 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+import json
 
 #User model to store all user data
 class User(AbstractUser):
+
+    website_url = models.URLField()
+    linkedin_url = models.URLField()
+    github_url = models.URLField()
+
+    #Return the details above in a JSON format
+    def serialize(self):
+        return json.dumps({
+            "website": self.website_url,
+            "linkedin":self.linkedin_url,
+            "github": self.github_url
+        })
 
     #Returns a string summary of an instance
     def __str__(self) -> str:
@@ -55,21 +68,65 @@ class Application(models.Model):
     recruiter = models.ForeignKey("Recruiter", null=True, blank=True)
     resume = models.ForeignKey("Resume", null=True, blank=True)
 
+    #Return application instance in a dictionary format
+    def serialize(self):
+
+        #The output dictionary
+        output = {
+            "id": self.id,
+            "created_by": self.created_by,
+            "role": self.role,
+            "company": self.company,
+            "description": self.description,
+            "applied_on": self.applied_on,
+            "status": self.status,
+            "location": self.location,
+            "type": self.type,
+            "recruiter": self.recruiter,
+            "resume": self.resume
+        }
+
+        #Return the dictionary
+        return output
+
 
 #Model to store company data
 class Company(models.Model):
-    name = models.CharField(max_length=64),
+    tracked_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_company")
+    name = models.CharField(max_length=64)
+    domain = models.CharField(max_length=64)
     website = models.URLField()
+
+    #Return a Company instance in a dictionary format
+    def serialize(self):
+        return {
+            "name": self.name,
+            "domain": self.domain,
+            "website": self.website
+        }
 
 
 #Model to store recruiter data
 class Recruiter(models.Model):
-    name = models.CharField(max_length=64),
+    tracked_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_recruiter")
+    name = models.CharField(max_length=64)
+    company = models.ForeignKey(Company)
     email = models.EmailField()
     linkedin = models.URLField()
+
+    #Return a Recruiter instance in a dictionary format
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "company": self.company,
+            "email": self.email,
+            "linkedin": self.linkedin
+        }
 
 
 #Model to store resume data
 class Resume(models.Model):
+    owned_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_files")
     doc_name = models.CharField(max_length=64)
     file_path = models.FileField()

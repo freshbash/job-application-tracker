@@ -131,5 +131,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+#URL for serving user uploaded files
+MEDIA_URL = "/local-storage/"
+
 #Path for storing user-uploaded files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'local-storage')
