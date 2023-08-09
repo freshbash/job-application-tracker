@@ -13,7 +13,7 @@ class User(AbstractUser):
     def serialize(self):
         return json.dumps({
             "website": self.website_url,
-            "linkedin":self.linkedin_url,
+            "linkedin": self.linkedin_url,
             "github": self.github_url
         })
 
