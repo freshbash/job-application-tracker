@@ -1,22 +1,22 @@
 from django.test import TestCase
 from django.urls import resolve, reverse
-from application_tracker.views.api import login, register
-from application_tracker.views.render_templates import index, create_application, view_documents, view_analytics
-from application_tracker.views.user_auth import get_applications, get_documents, add_document, delete_document, modify_application, delete_application
+from application_tracker.views import user_auth, render_templates, api
 
+#Dictionary with name for url paths as keys and view function names as values.
 function_dictionary = {
-    "login": login,
-    "register": register,
-    "index": index,
-    "get_applications": get_applications,
-    "create_application": create_application,
-    "view_documents": view_documents,
-    "get_documents": get_documents,
-    "view_analytics": view_analytics,
-    "add_document": add_document,
-    "delete_document": delete_document,
-    "modify_application": modify_application,
-    "delete_application": delete_application
+    "login": user_auth.login,
+    "register": user_auth.register,
+    "index": render_templates.index,
+    "get_applications": api.get_applications,
+    "create_application": render_templates.create_application,
+    "view_documents": render_templates.view_documents,
+    "get_documents": api.get_documents,
+    "view_analytics": render_templates.view_analytics,
+    "get_analytics_data": api.get_analytics_data,
+    "add_document": render_templates.add_document,
+    "delete_document": api.delete_document,
+    "modify_application": api.modify_application,
+    "delete_application": api.delete_application
 }
 
 class TestURLs(TestCase):
