@@ -21,11 +21,11 @@ def register(request):
         username = request.POST["username"]
         password = request.POST["password"]
         website = request.POST["website"]
-        email = request.POST["email"]
+        github = request.POST["github"]
         linkedin = request.POST["linkedin"]
 
         #Create a new user
-        new_user = User.objects.create_user(username=username, password=password, website_url=website, email_url=email, linkedin_url=linkedin)
+        new_user = User.objects.create_user(username=username, password=password, website_url=website, github_url=github, linkedin_url=linkedin)
 
         #Save the new user
         new_user.save()
@@ -63,3 +63,4 @@ def logout(request):
 
     #Redirect the user to the landing page
     return HttpResponseRedirect(reverse("index"))
+# 

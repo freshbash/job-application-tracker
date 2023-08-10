@@ -5,9 +5,9 @@ import json
 #User model to store all user data
 class User(AbstractUser):
 
-    website_url = models.URLField()
-    linkedin_url = models.URLField()
-    github_url = models.URLField()
+    website_url = models.URLField(blank=True, null=True)
+    linkedin_url = models.URLField(blank=True, null=True)
+    github_url = models.URLField(blank=True, null=True)
 
     #Return the details above in a JSON format
     def serialize(self):
