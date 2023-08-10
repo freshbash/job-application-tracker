@@ -92,9 +92,7 @@ class Application(models.Model):
 
 #Model to store company data
 class Company(models.Model):
-    tracked_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_company")
     name = models.CharField(max_length=64)
-    domain = models.CharField(max_length=64)
     website = models.URLField()
 
     #Return a Company instance in a dictionary format
