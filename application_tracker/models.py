@@ -95,22 +95,14 @@ class Company(models.Model):
     name = models.CharField(max_length=64)
     website = models.URLField()
 
-    #Return a Company instance in a dictionary format
-    def serialize(self):
-        return {
-            "name": self.name,
-            "domain": self.domain,
-            "website": self.website
-        }
-
 
 #Model to store recruiter data
 class Recruiter(models.Model):
     tracked_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_recruiter")
     name = models.CharField(max_length=64)
-    company = models.ForeignKey(Company)
-    email = models.EmailField()
-    linkedin = models.URLField()
+    company = models.ForeignKey(Company, blank=True)
+    email = models.EmailField(blank=True, default="No Email")
+    linkedin = models.URLField(blank=True, default="No LinkedIn")
 
     #Return a Recruiter instance in a dictionary format
     def serialize(self):
@@ -128,3 +120,11 @@ class Resume(models.Model):
     owned_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_files")
     doc_name = models.CharField(max_length=64)
     file_path = models.FileField()
+
+    #Method to return serialized resume data
+    def serialize(self):
+        return {
+            "id": self.id,
+            "doc_name": self.doc_name,
+            "file_data": self.file_path
+        }
