@@ -119,7 +119,7 @@ class Recruiter(models.Model):
 class Resume(models.Model):
     owned_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_files")
     doc_name = models.CharField(max_length=64)
-    file_path = models.FileField()
+    file = models.FileField()
 
     #Method to return serialized resume data
     def serialize(self):
