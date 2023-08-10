@@ -1,6 +1,5 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from application_tracker.views import user_auth
 from application_tracker.models import User
 
 class TestUserAuth(TestCase):
@@ -62,4 +61,22 @@ class TestUserAuth(TestCase):
         })
 
         #Check that the response is 302 Found
-        self.assertEqual(response.status_code, 302)        
+        self.assertEqual(response.status_code, 302)
+
+    #Test user logout
+    def test_user_logout(self):
+
+        #Create a test user
+        test_user = User.objects.create_user(
+            username="test_user_2",
+            password="qBCatkk4@s48669"
+        )
+
+        #Log the user in
+        self.client.login(username="test_user_2", password="qBCatkk4@s48669")
+
+        #Send a POST request to the logout page
+        response = self.client.post(reverse("logout"))
+
+        #Check that the response is 302 Found
+        self.assertEqual(response.status_code, 302)
