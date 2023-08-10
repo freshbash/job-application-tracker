@@ -27,4 +27,4 @@ class TestURLs(TestCase):
 
         for (name, func) in function_dictionary.items():
             url = reverse(name)
-            self.assertEquals(resolve(url).func, func)
+            self.assertEqual(resolve(url).func, func, msg="Incorrect view function for url: " + url)
