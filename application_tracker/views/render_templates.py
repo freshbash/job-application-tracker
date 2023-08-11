@@ -12,12 +12,12 @@ def index(request):
     if request.user.is_authenticated:
 
         #Render the home page
-        return render(request, "application_tracker/index.html")
+        return render(request, "application_tracker/index.html", status=200)
 
     else:
 
         #Render landing page
-        return render(request, "application_tracker/landing.html")
+        return render(request, "application_tracker/landing.html", status=200)
 
 
 #Render create application page
@@ -25,7 +25,7 @@ def index(request):
 def create_application_page(request):
         if request.method == "GET":
             #Render the create application page
-            return render(request, "application_tracker/create_application.html")
+            return render(request, "application_tracker/create_application.html", status=200)
         
 
 #Render the create application page
@@ -60,7 +60,10 @@ def create_application(request):
         else:
 
             #Get the company object from the database
-            company = models.Company.objects.get(request.POST["company_name"].toLowerCase())                
+            try:
+                company = models.Company.objects.get(request.POST["company_name"].toLowerCase())
+            except models.Company.DoesNotExist:
+                pass
         
         #Check if user has added details for a new recruiter
         add_new_recruiter = True if request.POST["add_new_recruiter"] == "true" else False
@@ -88,7 +91,10 @@ def create_application(request):
                 recruiter.save()
         else:
             #Get the recruiter object from the database
-            recruiter = models.Recruiter.objects.get(id=int(request.POST["recruiter_id"]))
+            try:
+                recruiter = models.Recruiter.objects.get(id=int(request.POST["recruiter_id"]))
+            except models.Recruiter.DoesNotExist:
+                pass
 
         #Get the resume
         add_new_resume = True if request.POST["add_new_resume"] == "true" else False
@@ -111,7 +117,10 @@ def create_application(request):
         else:
 
             #Get the resume object from the database
-            resume = models.Resume.objects.get(id=int(request.POST["resume_id"]))
+            try:
+                resume = models.Resume.objects.get(id=int(request.POST["resume_id"]))
+            except models.Resume.DoesNotExist:
+                pass
 
 
         #Create a new application object
