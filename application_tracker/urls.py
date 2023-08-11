@@ -15,7 +15,7 @@ urlpatterns = [
     path("create", render_templates.create_application, name="create_application"),
     path("view", render_templates.view_documents, name="view_documents"),
     path("add", render_templates.add_document, name="add_document"),
-    path("deletedoc", api.delete_document, name="delete_document"),
+    path("deletedoc/<int:doc_id>", api.delete_document, name="delete_document"),
     path("analytics", render_templates.view_analytics, name="view_analytics"),
 
     #API

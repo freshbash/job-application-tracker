@@ -158,13 +158,26 @@ def add_document(request):
 
         #Redirect to documents page
         return HttpResponseRedirect(reverse("view_documents"))
+
+
+#Handle deleting a document
+def delete_document(request, doc_id):
+    if request.method == "DELETE":
+        #Get the document object from the database
+        doc = models.Resume.objects.get(id=doc_id)
+
+        #Delete the document
+        doc.file.delete()
+
+        #Delete the instance
+        doc.delete()
+
+        #Redirect to documents page
+        return HttpResponseRedirect(reverse("view_documents"))
     
 
-#Handle analytics
+#Render the analytics
 def view_analytics(request):
-    
-    #Get all the applications created by the user
-    applications = models.Application.objects.filter(created_by=request.user).values("applied_on", "status")
 
     #Render the analytics page
-    return render(request, "application_tracker/analytics.html", {"applications": applications})
+    return render(request, "application_tracker/analytics.html")
