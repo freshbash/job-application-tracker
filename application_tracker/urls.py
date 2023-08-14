@@ -19,7 +19,8 @@ urlpatterns = [
     path("analytics", render_templates.view_analytics, name="view_analytics"),
 
     #API
-    path("api/applications/<str:type>", api.get_applications, name="get_applications"),    
+    path("api/applications/<str:type>", api.get_applications, name="get_applications"),
+    path("api/analytics", api.get_data, name="get_analytics_data"),
     path("api/modify_appl", api.modify_application, name="modify_application"),
     path("api/delete_appl", api.delete_application, name="delete_application")
 ]

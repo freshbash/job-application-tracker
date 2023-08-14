@@ -126,3 +126,41 @@ class TestRenderTemplates(TestCase):
 
         #Check if a resume instance was created
         self.assertEqual(models.Resume.objects.all().count(), 1)
+
+    #Test delete document
+    def test_delete_document(self):
+
+        #Log the test_user in
+        self.client.force_login(self.test_user)
+
+        #Create a resume instance
+        resume = models.Resume.objects.create(
+            user=self.test_user,
+            resume="hello.pdf"
+        )
+
+        #Make a POST request to delete document
+        response = self.client.post(reverse("delete_document"), {
+            "resume_id": resume.id
+        })
+
+        #Check if the response is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        #Check if the resume instance was deleted
+        self.assertEqual(models.Resume.objects.all().count(), 0)
+
+    #def view analytics
+    def test_view_analytics(self):
+        
+        #Log test_user in
+        self.client.force_login(self.test_user)
+
+        #Make a GET request to view_analytics
+        response = self.client.get(reverse("view_analytics"))
+
+        #Check if the response is 200 OK
+        self.assertEqual(response.status_code, 200)
+        
+        #Check if the correct template is rendered
+        self.assertTemplateUsed(response, "application_tracker/view_analytics.html")

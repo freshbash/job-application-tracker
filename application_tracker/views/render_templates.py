@@ -142,7 +142,9 @@ def create_application(request):
         #Redirect to the home page
         return HttpResponseRedirect(reverse("index"))
 
+
 #Render the documents page
+@login_required(redirect_field_name="create", login_url="login_page")
 def view_documents(request):
 
     #Get all the documents uploaded by the user
@@ -151,7 +153,9 @@ def view_documents(request):
     #Render the documents page
     return render(request, "application_tracker/view_documents.html", {"documents": documents})
 
+
 #Handle adding a new document
+@login_required(redirect_field_name="create", login_url="login_page")
 def add_document(request):
 
     if request.method == "POST":
@@ -170,6 +174,7 @@ def add_document(request):
 
 
 #Handle deleting a document
+@login_required(redirect_field_name="create", login_url="login_page")
 def delete_document(request, doc_id):
     if request.method == "DELETE":
         #Get the document object from the database
@@ -186,6 +191,7 @@ def delete_document(request, doc_id):
     
 
 #Render the analytics
+@login_required(redirect_field_name="create", login_url="login_page")
 def view_analytics(request):
 
     #Render the analytics page
