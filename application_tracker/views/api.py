@@ -36,3 +36,12 @@ def get_applications(request, type):
             return JsonResponse(queryset_to_dict(closed_applications), status=302)
     else:
         return JsonResponse({"error": "GET request required."}, status=403)
+    
+#API endpoint to get analytics
+def get_data(request):
+
+    #Get application date and status of all applications made by the user sorted by date in ascending order
+    applications = Application.objects.only("applied_on", "status").filter(created_by=request.user).order_by("applied_on")
+
+    #Send a json response to the frontend
+    return JsonResponse(queryset_to_dict(applications), status=302)
