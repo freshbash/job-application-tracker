@@ -30,10 +30,10 @@ class Application(models.Model):
     description = models.TextField()
 
     application_status_choices = [
-        ("APP", "Applied"),
-        ("INP", "Interviews ongoing"),
-        ("REJ", "Rejected"),
-        ("ACC", "Accepted")
+        ("APP", "Applied"), #Applicant made an application with the company
+        ("INP", "Interviews ongoing"), #Interviews are ongoing between the company and the applicant
+        ("REJ", "Rejected"), #Applicant was rejected by the company
+        ("ACC", "Accepted") #Company made a offer and the applicant has accepted and joined the company
     ]
 
     status = models.CharField(
@@ -92,6 +92,7 @@ class Application(models.Model):
 
 #Model to store company data
 class Company(models.Model):
+    tracked_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_company")
     name = models.CharField(max_length=64)
     website = models.URLField()
 
@@ -119,7 +120,7 @@ class Recruiter(models.Model):
 class Resume(models.Model):
     owned_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_files")
     doc_name = models.CharField(max_length=64)
-    file = models.FileField()
+    file = models.FileField(upload_to='')
 
     #Method to return serialized resume data
     def serialize(self):
