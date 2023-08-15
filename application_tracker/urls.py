@@ -17,9 +17,14 @@ urlpatterns = [
     path("add", render_templates.add_document, name="add_document"),
     path("deletedoc/<int:doc_id>", render_templates.delete_document, name="delete_document"),
     path("analytics", render_templates.view_analytics, name="view_analytics"),
+    path("recruiters", render_templates.view_recruiters, name="view_recruiters"),
+    path("companies", render_templates.view_companies, name="view_companies"),
 
     #API
-    path("api/applications/<str:type>", api.get_applications, name="get_applications"),
+    path("api/applications/<str:type>?pg=<int:page>", api.get_applications, name="get_applications"),
+    path("api/get_recruiters?pg=<int:page>", api.get_recruiters, name="get_recruiters"),
+    path("api/get_companies?pg=<int:page>", api.get_companies, name="get_companies"),
+    path("api/add_recruiter", api.add_recruiter, name="add_recruiter"),
     path("api/analytics", api.get_data, name="get_analytics_data"),
     path("api/modify_appl/<int:app_id>", api.modify_application, name="modify_application"),
     path("api/delete_appl/<int:app_id>", api.delete_application, name="delete_application")

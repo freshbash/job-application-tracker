@@ -198,3 +198,19 @@ def view_analytics(request):
 
     #Render the analytics page
     return render(request, "application_tracker/analytics.html")
+
+
+#Render the recruiters page
+@login_required(redirect_field_name="create", login_url="login_page")
+def view_recruiters(request):
+    
+        #Render the recruiters page
+        return render(request, "application_tracker/recruiters.html")
+
+
+#Render the companies page
+@login_required(redirect_field_name="create", login_url="login_page")
+def view_companies(request):
+
+    #Render the companies page
+    return render(request, "application_tracker/companies.html")

@@ -165,3 +165,35 @@ class TestRenderTemplates(TestCase):
         
         #Check if the correct template is rendered
         self.assertTemplateUsed(response, "application_tracker/view_analytics.html")
+
+
+    #Test view recruiters
+    def test_view_recruiters(self):
+
+        #Log the test_user in
+        self.client.force_login(self.test_user)
+
+        #Make a GET request to view recruiters
+        response = self.client.get(reverse("view_recruiters"))
+
+        #Check if the response is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        #Check if the correct template is rendered
+        self.assertTemplateUsed(response, "application_tracker/view_recruiters.html")
+
+    
+    #Test view companies
+    def test_view_companies(self):
+
+        #Log the test_user in
+        self.client.force_login(self.test_user)
+
+        #Make a GET request to view companies
+        response = self.client.get(reverse("view_companies"))
+
+        #Check if the response is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        #Check if the correct template is rendered
+        self.assertTemplateUsed(response, "application_tracker/view_companies.html")
