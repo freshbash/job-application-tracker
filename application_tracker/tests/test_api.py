@@ -119,3 +119,15 @@ def TestAPI(TestCase):
 
         #Check that the response is 204 no content
         self.assertEqual(response.status_code, 204)
+
+    #Test delete_application
+    def test_delete_application(self):
+
+        #Log the test_user in
+        self.client.force_login(self.test_user)
+
+        #Make a DELETE request to delete_application
+        response = self.client.delete(reverse("delete_applications", args=[1]))
+
+        #Check that the response is 204 no content
+        self.assertEqual(response.status_code, 204)

@@ -77,3 +77,19 @@ def modify_application(request, app_id):
 
         #Send a json response to the frontend
         return JsonResponse(status=204)
+
+
+#API endpoint to delete an application
+def delete_application(request, app_id):
+    
+    #Handle delete requests
+    if request.method == "DELETE":
+
+        #Get the application
+        application = Application.objects.get(pk=app_id)
+
+        #Delete the application
+        application.delete()
+
+        #Send a json response to the frontend
+        return JsonResponse(status=204)
