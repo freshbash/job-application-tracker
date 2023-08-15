@@ -4,15 +4,18 @@ from application_tracker.views import user_auth, render_templates, api
 
 #Dictionary with name for url paths as keys and view function names as values.
 function_dictionary = {
-    "login": user_auth.login,
+    "registration_page": user_auth.registration_page,
+    "login_page": user_auth.login_page,
+    "login": user_auth.login_user,
     "register": user_auth.register,
+    "logout": user_auth.logout_user,
     "index": render_templates.index,
     "get_applications": api.get_applications,
+    "create_application_page": render_templates.create_application_page,
     "create_application": render_templates.create_application,
     "view_documents": render_templates.view_documents,
-    "get_documents": api.get_documents,
     "view_analytics": render_templates.view_analytics,
-    "get_analytics_data": api.get_analytics_data,
+    "get_analytics_data": api.get_data,
     "add_document": render_templates.add_document,
     "delete_document": api.delete_document,
     "modify_application": api.modify_application,

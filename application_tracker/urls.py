@@ -5,9 +5,9 @@ urlpatterns = [
     #User Auth
     path("registration", user_auth.registration_page, name="registration_page"),
     path("login_page", user_auth.login_page, name="login_page"),
-    path("login", user_auth.login, name="login"),
+    path("login", user_auth.login_user, name="login"),
     path("register", user_auth.register, name="register"),
-    path("logout", user_auth.logout, name="logout"),
+    path("logout", user_auth.logout_user, name="logout"),
 
     #Render Templates
     path("", render_templates.index, name="index"),
@@ -15,7 +15,7 @@ urlpatterns = [
     path("create", render_templates.create_application, name="create_application"),
     path("view", render_templates.view_documents, name="view_documents"),
     path("add", render_templates.add_document, name="add_document"),
-    path("deletedoc/<int:doc_id>", api.delete_document, name="delete_document"),
+    path("deletedoc/<int:doc_id>", render_templates.delete_document, name="delete_document"),
     path("analytics", render_templates.view_analytics, name="view_analytics"),
 
     #API

@@ -37,7 +37,7 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     
 #View to handle user login
-def login(request):
+def login_user(request):
     if request.method == "POST":
         
         #Get login data
@@ -58,9 +58,8 @@ def login(request):
             return render(request, "application_tracker/login_page.html", {"message": "Incorrect username/password"})
         
 #View to handle user logout
-def logout(request):
+def logout_user(request):
     logout(request)
 
     #Redirect the user to the landing page
     return HttpResponseRedirect(reverse("index"))
-# 
