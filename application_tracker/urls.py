@@ -21,6 +21,6 @@ urlpatterns = [
     #API
     path("api/applications/<str:type>", api.get_applications, name="get_applications"),
     path("api/analytics", api.get_data, name="get_analytics_data"),
-    path("api/modify_appl", api.modify_application, name="modify_application"),
-    path("api/delete_appl", api.delete_application, name="delete_application")
+    path("api/modify_appl/<int:app_id>", api.modify_application, name="modify_application"),
+    path("api/delete_appl/<int:app_id>", api.delete_application, name="delete_application")
 ]

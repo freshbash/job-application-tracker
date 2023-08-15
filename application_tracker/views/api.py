@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.db.models import Q
 from application_tracker.models import Application
+import json
 
 #Convert a queryset to a dictionary
 def queryset_to_dict(qset):
@@ -45,3 +46,34 @@ def get_data(request):
 
     #Send a json response to the frontend
     return JsonResponse(queryset_to_dict(applications), status=302)
+
+
+#API endpoint to modify an application
+def modify_application(request, app_id):
+
+    if request.method == "PUT":
+
+        #Get the data in request body
+        modified_data = json.loads(request.body)
+
+        #Get the application
+        application = Application.objects.get(pk=app_id)
+
+        #Make the modifications
+        application.role = modified_data["role"]
+        application.company.name = modified_data["company_name"]
+        application.company.website = modified_data["company_website"]
+        application.description = modified_data["description"]
+        application.posting = modified_data["posting"]
+        application.status = modified_data["status"]
+        application.location = modified_data["location"]
+        application.type = modified_data["type"]
+        application.recruiter.name = modified_data["recruiter_name"]
+        application.recruiter.email = modified_data["recruiter_email"]
+        application.recruiter.linkedin = modified_data["recruiter_linkedin"]
+
+        #Save the changes
+        application.save()
+
+        #Send a json response to the frontend
+        return JsonResponse(status=204)

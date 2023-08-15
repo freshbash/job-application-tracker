@@ -95,3 +95,27 @@ def TestAPI(TestCase):
         data = response.json()
 
         self.assertEqual(len(data), 2)
+
+    #Test modify_application
+    def test_modify_application(self):
+
+        #Log the test_user in
+        self.client.force_login(self.test_user)
+
+        #Make a PUT request to modify_application
+        response = self.client.put(reverse("modify_application", args=[0]), json.dumps({
+            "role": "Backend Engineer",
+            "company_name": "Google",
+            "company_website": "https://www.google.com",
+            "description": "Test description",
+            "posting": "https://www.careers.google.com",
+            "status": "interviews-ongoing",
+            "location": "Munich, Germany",
+            "type": "full-time-onsite",
+            "recruiter_name": "Gary John",
+            "recruiter_email": "longjohns@googlerecruiting.com",
+            "recruiter_linkedin": "https://www.linkedin.com/in/garyjohn"
+        }))
+
+        #Check that the response is 204 no content
+        self.assertEqual(response.status_code, 204)

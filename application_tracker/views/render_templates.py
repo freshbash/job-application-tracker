@@ -38,6 +38,7 @@ def create_application(request):
         #Get the data from the form
         role = request.POST["role"]
         description = request.POST["description"]
+        posting = request.POST["posting"]
         location = request.POST["location"]
         status = request.POST["status"]
         employment_type = request.POST["employment_type"]
@@ -129,6 +130,7 @@ def create_application(request):
             role=role,
             company=company,
             description=description,
+            posting=posting,
             location=location,
             status=status,
             employment_type=employment_type,

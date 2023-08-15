@@ -28,12 +28,13 @@ class Application(models.Model):
     company = models.ForeignKey("Company")
     applied_on = models.DateField(auto_now_add=True)
     description = models.TextField()
+    posting = models.URLField()
 
     application_status_choices = [
-        ("APP", "Applied"), #Applicant made an application with the company
-        ("INP", "Interviews ongoing"), #Interviews are ongoing between the company and the applicant
-        ("REJ", "Rejected"), #Applicant was rejected by the company
-        ("ACC", "Accepted") #Company made a offer and the applicant has accepted and joined the company
+        ("APP", "applied"), #Applicant made an application with the company
+        ("INP", "interviews-ongoing"), #Interviews are ongoing between the company and the applicant
+        ("REJ", "rejected"), #Applicant was rejected by the company
+        ("ACC", "accepted") #Company made a offer and the applicant has accepted and joined the company
     ]
 
     status = models.CharField(
@@ -45,18 +46,18 @@ class Application(models.Model):
     location = models.CharField(max_length=64)
     
     employment_types = [
-        ("FLT-ON", "Full-time onsite"),
-        ("FLT-RE", "Full-time remote"),
-        ("FLT-HY", "Full-time hybrid"),
-        ("PRT-ON", "Part-time onsite"),
-        ("PRT-RE", "Part-time remote"),
-        ("PRT-HY", "Part-time hybrid"),
-        ("CON-ON", "Contract onsite"),
-        ("CON-RE", "Contract remote"),
-        ("CON-HY", "Contract hybrid"),
-        ("INT-ON", "Intership onsite"),
-        ("INT-RE", "Intership remote"),
-        ("INT-HY", "Intership hybrid"),
+        ("FLT-ON", "full-time-onsite"),
+        ("FLT-RE", "full-time-remote"),
+        ("FLT-HY", "full-time-hybrid"),
+        ("PRT-ON", "part-time-onsite"),
+        ("PRT-RE", "part-time-remote"),
+        ("PRT-HY", "part-time-hybrid"),
+        ("CON-ON", "contract-onsite"),
+        ("CON-RE", "contract-remote"),
+        ("CON-HY", "contract-hybrid"),
+        ("INT-ON", "intership-onsite"),
+        ("INT-RE", "intership-remote"),
+        ("INT-HY", "intership-hybrid"),
     ]
 
     type = models.CharField(
@@ -78,6 +79,7 @@ class Application(models.Model):
             "role": self.role,
             "company": self.company,
             "description": self.description,
+            "posting": self.posting,
             "applied_on": self.applied_on,
             "status": self.status,
             "location": self.location,

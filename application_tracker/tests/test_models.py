@@ -69,6 +69,7 @@ class TestModels(TestCase):
             role = "role",
             company = self.test_company,
             description = "description",
+            posting = "www.careers.com",
             applied_on = "2020-01-01",
             status = "APP",
             location = "location",
@@ -86,6 +87,7 @@ class TestModels(TestCase):
         self.assertEqual(type(serializedOutput["role"]), str)
         self.assertEqual(type(serializedOutput["company"]), models.Company)
         self.assertEqual(type(serializedOutput["description"]), str)
+        self.assertEqual(type(serializedOutput["posting"]), str)
         self.assertEqual(type(serializedOutput["applied_on"]), datetime.date)
         self.assertEqual(type(serializedOutput["status"]), str)
         self.assertEqual(type(serializedOutput["location"]), str)

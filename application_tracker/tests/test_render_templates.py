@@ -65,6 +65,7 @@ class TestRenderTemplates(TestCase):
         response = self.client.post(reverse("create_application"), {
             "role": "SWE",
             "description": "Test description",
+            "posting": "https://www.test.com",
             "location": "Test location",
             "status": "Applied",
             "employment_type": "FLT-ON",
