@@ -18,14 +18,6 @@ def index(request):
 
         #Render landing page
         return render(request, "application_tracker/landing.html", status=200)
-
-
-#Render create application page
-@login_required(redirect_field_name="create", login_url="login_page")
-def create_application_page(request):
-        if request.method == "GET":
-            #Render the create application page
-            return render(request, "application_tracker/create_application.html", status=200)
         
 
 #Render the create application page
@@ -56,13 +48,13 @@ def create_application(request):
             try:
                 company = models.Company.objects.get(name=co_name)
             except models.Company.DoesNotExist:
-                company = models.Company.objects.create(name=co_name, website=website)
+                company = models.Company.objects.create(tracked_by=request.user, name=co_name, website=website)
                 company.save()
         else:
 
             #Get the company object from the database
             try:
-                company = models.Company.objects.get(request.POST["company_name"].toLowerCase())
+                company = models.Company.objects.get(tracked_by=request.user, id=int(request.POST["company_id"]))
             except models.Company.DoesNotExist:
                 pass
         
@@ -93,103 +85,44 @@ def create_application(request):
         else:
             #Get the recruiter object from the database
             try:
-                recruiter = models.Recruiter.objects.get(id=int(request.POST["recruiter_id"]))
+                recruiter = models.Recruiter.objects.get(tracked_by=request.user, id=int(request.POST["recruiter_id"]))
             except models.Recruiter.DoesNotExist:
                 pass
 
-        #Get the resume
-        add_new_resume = True if request.POST["add_new_resume"] == "true" else False
-
-        resume = None
-
-        #If the user has added details for a new resume, create a new resume object
-        if add_new_resume:
-
-            #Get the uploaded file
-            pdf = request.FILES.get("resume")
-            #Store the original file name
-            file_name = pdf.name
-            #Create a new file name for the resume
-            pdf.name = f"{request.user.id}_{file_name}"        
-
-            #Create a new resume object
-            resume = models.Resume.objects.create(owned_by=request.user, doc_name=file_name, file=pdf)
-            resume.save()
-        else:
-
-            #Get the resume object from the database
-            try:
-                resume = models.Resume.objects.get(id=int(request.POST["resume_id"]))
-            except models.Resume.DoesNotExist:
-                pass
+        #Get the uploaded file
+        pdf = request.FILES.get("resume")
+        #Store the original file name
+        file_name = pdf.name
 
 
         #Create a new application object
         new_application = models.Application(
             created_by=request.user,
             role=role,
-            company=company,
+            company_name=company.name,
+            company_website=company.website,
             description=description,
             posting=posting,
             location=location,
             status=status,
             employment_type=employment_type,
-            recruiter=recruiter,
-            resume=resume
+            recruiter_name=recruiter.name,
+            recruiter_email=recruiter.email,
+            recruiter_linkedin=recruiter.linkedin,
+            resume_name=file_name,
         )
+
+        #Create a new file name for the resume
+        pdf.name = f"{request.user.id}_{new_application.id}_{file_name}"
+
+        #Attach the file to the application
+        new_application.file = pdf
 
         #Save the new application object
         new_application.save()
 
         #Redirect to the home page
         return HttpResponseRedirect(reverse("index"))
-
-
-#Render the documents page
-@login_required(redirect_field_name="create", login_url="login_page")
-def view_documents(request):
-
-    #Get all the documents uploaded by the user
-    documents = models.Resume.objects.filter(owned_by=request.user).all()
-
-    #Render the documents page
-    return render(request, "application_tracker/view_documents.html", {"documents": documents})
-
-
-#Handle adding a new document
-@login_required(redirect_field_name="create", login_url="login_page")
-def add_document(request):
-
-    if request.method == "POST":
-
-        #Get file from the form
-        pdf = request.FILES.get("new_resume")
-        file_name = pdf.name
-        pdf.name = f"{request.user.id}_{file_name}"
-
-        #Create a new resume object
-        new_doc = models.Resume.objects.create(owned_by=request.user, doc_name=file_name, file=pdf)
-        new_doc.save()
-
-        #Redirect to documents page
-        return HttpResponseRedirect(reverse("view_documents"))
-
-
-#Handle deleting a document
-@login_required(redirect_field_name="create", login_url="login_page")
-def delete_document(request, doc_id):
-    if request.method == "DELETE":
-        #Get the document object from the database
-        doc = models.Resume.objects.get(id=doc_id)
-
-        #Delete the document
-        doc.file.delete()
-
-        #Delete the instance
-        doc.delete()
-
-        #Redirect to documents page
-        return HttpResponseRedirect(reverse("view_documents"))
     
 
 #Render the analytics

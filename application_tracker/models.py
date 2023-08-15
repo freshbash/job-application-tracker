@@ -25,7 +25,8 @@ class User(AbstractUser):
 class Application(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="app_creator")
     role = models.CharField(max_length=64)
-    company = models.ForeignKey("Company")
+    company_name = models.CharField(max_length=64)
+    company_website = models.URLField()
     applied_on = models.DateField(auto_now_add=True)
     description = models.TextField()
     posting = models.URLField()
@@ -66,30 +67,11 @@ class Application(models.Model):
         default=employment_types[0][0]
     )
 
-    recruiter = models.ForeignKey("Recruiter", null=True, blank=True)
-    resume = models.ForeignKey("Resume", null=True, blank=True)
-
-    #Return application instance in a dictionary format
-    def serialize(self):
-
-        #The output dictionary
-        output = {
-            "id": self.id,
-            "created_by": self.created_by,
-            "role": self.role,
-            "company": self.company,
-            "description": self.description,
-            "posting": self.posting,
-            "applied_on": self.applied_on,
-            "status": self.status,
-            "location": self.location,
-            "type": self.type,
-            "recruiter": self.recruiter,
-            "resume": self.resume
-        }
-
-        #Return the dictionary
-        return output
+    recruiter_name = models.CharField(max_length=64)
+    recruiter_email = models.EmailField(blank=True, default="No Email")
+    recruiter_linkedin = models.URLField(blank=True, default="No LinkedIn")
+    resume_name = models.CharField(max_length=64)
+    file = models.FileField(upload_to='')
 
 
 #Model to store company data
@@ -103,31 +85,19 @@ class Company(models.Model):
 class Recruiter(models.Model):
     tracked_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_recruiter")
     name = models.CharField(max_length=64)
-    company = models.ForeignKey(Company, blank=True)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="recruiter_company", blank=True)
     email = models.EmailField(blank=True, default="No Email")
     linkedin = models.URLField(blank=True, default="No LinkedIn")
 
-    #Return a Recruiter instance in a dictionary format
-    def serialize(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "company": self.company,
-            "email": self.email,
-            "linkedin": self.linkedin
-        }
+#Model to store analytics data
+class Analytics(models.Model):
+    tracked_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_analytics")
+    application = models.ForeignKey(Application, on_delete=models.PROTECT, related_name="application_analytics")
+    date = models.DateField(auto_now_add=True)
 
+    status_choices = [
+        ("ACC", "accepted"),
+        ("REJ", "rejected")
+    ]
 
-#Model to store resume data
-class Resume(models.Model):
-    owned_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_files")
-    doc_name = models.CharField(max_length=64)
-    file = models.FileField(upload_to='')
-
-    #Method to return serialized resume data
-    def serialize(self):
-        return {
-            "id": self.id,
-            "doc_name": self.doc_name,
-            "file_data": self.file_path
-        }
+    status = models.CharField(max_length=3, blank=True, choices=status_choices, null=True)
