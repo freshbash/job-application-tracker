@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.db import transaction
+from django.contrib.auth import logout
 from django.shortcuts import render, HttpResponseRedirect
 from django.urls import reverse
 from application_tracker import models
@@ -20,9 +20,8 @@ def index(request):
         return render(request, "application_tracker/landing.html", status=200)
         
 
-#Render the create application page
-@login_required(redirect_field_name="create", login_url="login_page")
-@transaction.atomic
+#Handle creation of a new application
+@login_required(login_url="login_page")
 def create_application(request):
         
     if request.method == "POST":
@@ -89,12 +88,7 @@ def create_application(request):
             except models.Recruiter.DoesNotExist:
                 pass
 
-        #Get the uploaded file
-        pdf = request.FILES.get("resume")
-        #Store the original file name
-        file_name = pdf.name
-
-
+        
         #Create a new application object
         new_application = models.Application(
             created_by=request.user,
@@ -109,14 +103,23 @@ def create_application(request):
             recruiter_name=recruiter.name,
             recruiter_email=recruiter.email,
             recruiter_linkedin=recruiter.linkedin,
-            resume_name=file_name,
         )
 
-        #Create a new file name for the resume
-        pdf.name = f"{request.user.id}_{new_application.id}_{file_name}"
+        #Get the uploaded file
+        pdf = request.FILES.get("resume")
 
-        #Attach the file to the application
-        new_application.file = pdf
+        #If the user has uploaded a file
+        if pdf:
+        
+            #Store the original file name
+            file_name = pdf.name
+
+            #Create a new file name for the resume
+            pdf.name = f"{request.user.id}_{new_application.id}_{file_name}"
+
+            #Attach the file to the application
+            new_application.resume_name = file_name
+            new_application.file = pdf
 
         #Save the new application object
         new_application.save()
@@ -126,7 +129,7 @@ def create_application(request):
     
 
 #Render the analytics
-@login_required(redirect_field_name="create", login_url="login_page")
+@login_required(login_url="login_page")
 def view_analytics(request):
 
     #Render the analytics page
@@ -134,7 +137,7 @@ def view_analytics(request):
 
 
 #Render the recruiters page
-@login_required(redirect_field_name="create", login_url="login_page")
+@login_required(login_url="login_page")
 def view_recruiters(request):
     
         #Render the recruiters page
@@ -142,8 +145,87 @@ def view_recruiters(request):
 
 
 #Render the companies page
-@login_required(redirect_field_name="create", login_url="login_page")
+@login_required(login_url="login_page")
 def view_companies(request):
 
     #Render the companies page
     return render(request, "application_tracker/companies.html")
+
+
+#Handle addition of a new recruiter
+@login_required(login_url="login_page")
+def add_recruiter(request):
+
+    #Handle POST request
+    if request.method == "POST":
+
+        #Get the data from the form
+        name = request.POST["name"]
+        email = request.POST["email"]
+        linkedin = request.POST["linkedin"]
+        company_name = request.POST["company"].toLowerCase()
+        company_website = request.POST["website"]
+
+        #Create or get a company object
+        company, created = models.Company.objects.get_or_create(
+            tracked_by=request.user,
+            name=company_name,
+            website=company_website
+        )
+
+        #Create a new recruiter object
+        recruiter = models.Recruiter.objects.create(
+            tracked_by=request.user,
+            name=name,
+            company=company,
+            email=email,
+            linkedin=linkedin
+        )
+
+        #Redirect to recruiters page
+        return HttpResponseRedirect(reverse("view_recruiters"))
+
+
+#Render the User Profile page
+@login_required(login_url="login_page")
+def view_profile(request):
+
+    #Handle only get requests
+    if request.method == "GET":
+
+        #Render the profile template
+        return render(request, "application_tracker/profile.html", status=200)
+    
+
+#Delete a user from the web app
+@login_required(login_url="login_page")
+def delete_account(request):
+
+    #Handle a DELETE request
+    if request.method == "DELETE":
+        
+        #Get all the applications
+        applications = models.Application.objects.all()
+
+        #Iterate over each application
+        for application in applications:
+
+            #Delete the file saved on server
+            try:
+                application.file.delete()
+            except:
+                pass
+
+        #Get the user object
+        outgoing_user = models.User.get(pk=request.user.id)
+
+        #Delete the outgoing user
+        outgoing_user.delete()
+
+        #Log the user out
+        logout(request)
+
+        #Render the landing page
+        return render(request, "application_tracker/landing.html", {
+            "message": "Your Account was deleted"
+        }, status=204)

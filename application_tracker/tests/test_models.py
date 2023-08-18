@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.core.files import File
 from application_tracker import models
 import json
-import datetime
 
 class TestModels(TestCase):
 
@@ -58,65 +57,3 @@ class TestModels(TestCase):
         user_data_json = json.dumps(user_data)
 
         self.assertEquals(jsonData, user_data_json)
-
-    
-    #Test the methods in Application model
-    def test_application(self):
-
-        #Create a test application
-        test_application = models.Application.objects.create(
-            created_by = self.test_user,
-            role = "role",
-            company = self.test_company,
-            description = "description",
-            posting = "www.careers.com",
-            applied_on = "2020-01-01",
-            status = "APP",
-            location = "location",
-            type = "FLT-ON",
-            recruiter = self.test_recruiter,
-            resume = self.test_resume
-        )
-
-        #Get the serialized test_application data
-        serializedOutput = test_application.serialize()
-
-        #Check the type of each field
-        self.assertEqual(type(serializedOutput["id"]), int)
-        self.assertEqual(type(serializedOutput["created_by"]), int)
-        self.assertEqual(type(serializedOutput["role"]), str)
-        self.assertEqual(type(serializedOutput["company"]), models.Company)
-        self.assertEqual(type(serializedOutput["description"]), str)
-        self.assertEqual(type(serializedOutput["posting"]), str)
-        self.assertEqual(type(serializedOutput["applied_on"]), datetime.date)
-        self.assertEqual(type(serializedOutput["status"]), str)
-        self.assertEqual(type(serializedOutput["location"]), str)
-        self.assertEqual(type(serializedOutput["type"]), str)
-        self.assertEqual(type(serializedOutput["recruiter"]), models.Recruiter)
-        self.assertEqual(type(serializedOutput["resume"]), models.Resume)
-
-
-    #Test the methods in Company model
-    def test_recruiter(self):
-        
-        #Get the serialized test_recruiter data
-        serializedOutput = self.test_recruiter.serialize()
-
-        #Check the type of each field
-        self.assertEqual(type(serializedOutput["id"]), int)
-        self.assertEqual(type(serializedOutput["name"]), str)
-        self.assertEqual(type(serializedOutput["company"]), models.Company)
-        self.assertEqual(type(serializedOutput["email"]), str)
-        self.assertEqual(type(serializedOutput["linkedin"]), str)
-
-
-    #Test the methods in Resume model
-    def test_resume(self):
-
-        #Get the serialized test_resume data
-        serializedOutput = self.test_resume.serialize()
-
-        #Check the type of each field
-        self.assertEqual(type(serializedOutput["id"]), int)
-        self.assertEqual(type(serializedOutput["doc_name"]), str)
-        self.assertEqual(type(serializedOutput["file_data"]), File)

@@ -40,21 +40,6 @@ class TestRenderTemplates(TestCase):
         #Check if the correct template is rendered
         self.assertTemplateUsed(response_a, "application_tracker/index.html")
 
-    #Test create application page
-    def test_create_application_page(self):
-
-        #Log the user in
-        self.client.force_login(self.test_user)
-
-        #Make a GET request to create application page
-        response = self.client.get(reverse("create_application_page"))
-
-        #Check if the response is 200 OK
-        self.assertEqual(response.status_code, 200)
-
-        #Check if the correct template is rendered
-        self.assertTemplateUsed(response, "application_tracker/create_application.html")
-
     #Test create application
     def test_create_application(self):
 
@@ -76,8 +61,8 @@ class TestRenderTemplates(TestCase):
             "recruiter_name": "Test recruiter",
             "recruiter_email": "rec@test.com",
             "recruiter_linkedin": "https://www.linkedin.com/rec",
-            "add_new_resume": "false",
-            "resume_id": ""
+            "resume_name": "resume.pdf",
+            "resume": ""
         })
 
         #Check if the response is 200 OK
@@ -93,64 +78,6 @@ class TestRenderTemplates(TestCase):
         self.assertEqual(models.Recruiter.objects.all().count(), 1)
 
     
-    #Test view documents
-    def test_view_documents(self):
-
-        #Log the test_user in
-        self.client.force_login(self.test_user)
-
-        #Make a GET request to view documents
-        response = self.client.get(reverse("view_documents"))
-
-        #Check if the correct template is rendered
-        self.assertTemplateUsed(response, "application_tracker/view_documents.html")
-
-        #Check if the context is passed
-        self.assertNotEqual(response.context.get("documents", ""), "")
-
-    #Test add document
-    def test_add_document(self):
-
-        #Log the test_user in
-        self.client.force_login(self.test_user)
-
-        response = None
-
-        #Make a POST request to add document
-        with open("hello.pdf", "rb") as f:
-            response = self.client.post(reverse("add_document"), {
-                "new_resume": f
-            })
-
-        #Check if the response is 201 Created
-        self.assertEqual(response.status_code, 201)
-
-        #Check if a resume instance was created
-        self.assertEqual(models.Resume.objects.all().count(), 1)
-
-    #Test delete document
-    def test_delete_document(self):
-
-        #Log the test_user in
-        self.client.force_login(self.test_user)
-
-        #Create a resume instance
-        resume = models.Resume.objects.create(
-            user=self.test_user,
-            resume="hello.pdf"
-        )
-
-        #Make a POST request to delete document
-        response = self.client.post(reverse("delete_document"), {
-            "resume_id": resume.id
-        })
-
-        #Check if the response is 200 OK
-        self.assertEqual(response.status_code, 200)
-
-        #Check if the resume instance was deleted
-        self.assertEqual(models.Resume.objects.all().count(), 0)
-
     #def view analytics
     def test_view_analytics(self):
         
@@ -197,3 +124,54 @@ class TestRenderTemplates(TestCase):
 
         #Check if the correct template is rendered
         self.assertTemplateUsed(response, "application_tracker/view_companies.html")
+
+    #Test functionality for adding a recruiter
+    def test_add_recruiter(self):
+
+        #Log the test_user in
+        self.client.force_login(self.test_user)
+
+        #Make a POST request to add_recruiter
+        response = self.client.post(reverse("add_recruiter"), {
+            "name": "barbora",
+            "email": "barbora@productboard.com",
+            "linkedin": "www.linkedin.com/barbora",
+            "company": "productboard",
+            "website": "www.productboard.com"
+        })
+
+        #Check if the response code is 302 Found
+        self.assertEqual(response.status_code, 302)
+
+    #Test the profile page
+    def test_view_profile(self):
+
+        #Log the test user in
+        self.client.force_login(self.test_user)
+
+        #Send a GET request to view_profile
+        response = self.client.get(reverse("view_profile"))
+
+        #Check that the response code is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        #Check if the correct template is used
+        self.assertTemplateUsed(response, "application_tracker/profile.html")
+
+    #Test the delete account functionality
+    def test_delete_account(self):
+
+        #Log the user in
+        self.client.force_login(self.test_user)
+
+        #Send a DELETE request to delete_account
+        response = self.client.delete(reverse("delete_account"))
+
+        #Check if the response status is 204
+        self.assertEqual(response.status_code, 204)
+
+        #Check whether the user is deleted
+        self.assertEqual(models.User.objects.all().count(), 0)
+
+        #Check if the correct template is rendered
+        self.assertTemplateUsed(response, "application_tracker/landing.html")

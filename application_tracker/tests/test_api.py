@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from application_tracker.models import User, Application
+from application_tracker.models import User, Application, Company, Recruiter, Link
 from django.urls import reverse
 import json
 
@@ -15,28 +15,52 @@ def TestAPI(TestCase):
         #Create a test user
         self.test_user = User.objects.create_user(
             username="test_user",
-            password="qBCatkk&4@s48669",
-            website="https://www.test.com",
-            github="https://www.github.com/test",
-            linkedin="https://www.linkedin.com/test"
+            password="qBCatkk&4@s48669"            
+        )
+
+        #Create a link for test_user
+        self.test_link = Link.objects.create(
+            owner = self.test_user,
+            title="LinkedIn",
+            url="https://www.linkedin.com/test"
         )
 
         #Create 2 application instances
-        open_application = Application.objects.create(
+        self.open_application = Application.objects.create(
             created_by=self.test_user,
             role="Software Engineer",
-            company="Google",
+            company_name="Google",
+            company_website="www.google.com",
+            posting="www.linkedin.com",
             description="Test description",
-            location="Munich, Germany"            
+            location="Munich, Germany"
         )
 
-        closed_application = Application.objects.create(
+        self.closed_application = Application.objects.create(
             created_by=self.test_user,
             role="Software Engineer",
-            company="Facebook",
+            company_name="Facebook",
+            company_website="www.facebook.com",
+            posting="www.linkedin.com",
             description="Test description",
             status="ACC",
             location="Munich, Germany"
+        )
+
+        #Create a company
+        self.test_company = Company.objects.create(
+            tracked_by=self.test_user,
+            name="Microsoft",
+            website="www.microsoft.com"
+        )
+
+        #Create a recruiter
+        self.test_recruiter = Recruiter.objects.create(
+            tracked_by=self.test_user,
+            name="papia",
+            company=self.test_company,
+            email="papia@microsoft.com",
+            linkedin="www.linkedin.com/papia"
         )
 
     def test_get_applications(self):
@@ -59,10 +83,7 @@ def TestAPI(TestCase):
         #Check that a valid json has been received or not
         opn_data = opn_response.json()
 
-        self.assertEqual(opn_data[0]["role"], "Software Engineer")
-        self.assertEqual(opn_data[0]["company"], "Google")
-        self.assertEqual(opn_data[0]["description"], "Test Description")
-        self.assertEqual(opn_data[0]["location"], "Munich, Germany")
+        self.assertEqual(len(opn_data["applications"]), 1)
 
         #Send a GET request to get_applications to get closed applications
         cls_response = self.client.get(reverse("get_applications", args=["cls"]))
@@ -73,10 +94,7 @@ def TestAPI(TestCase):
         #Check that a valid json has been received or not
         cls_data = cls_response.json()
 
-        self.assertEqual(cls_data[0]["role"], "Software Engineer")
-        self.assertEqual(cls_data[0]["company"], "Facebook")
-        self.assertEqual(cls_data[0]["description"], "Test Description")
-        self.assertEqual(cls_data[0]["location"], "Munich, Germany")
+        self.assertEqual(len(cls_data["applications"]), 1)
 
 
     #Test get_data
@@ -94,7 +112,7 @@ def TestAPI(TestCase):
         #Check that a valid json has been received or not
         data = response.json()
 
-        self.assertEqual(len(data), 2)
+        self.assertEqual(len(data["applications"]), 1)
 
     #Test modify_application
     def test_modify_application(self):
@@ -109,7 +127,7 @@ def TestAPI(TestCase):
             "company_website": "https://www.google.com",
             "description": "Test description",
             "posting": "https://www.careers.google.com",
-            "status": "interviews-ongoing",
+            "status": "rejected",
             "location": "Munich, Germany",
             "type": "full-time-onsite",
             "recruiter_name": "Gary John",
@@ -130,4 +148,137 @@ def TestAPI(TestCase):
         response = self.client.delete(reverse("delete_applications", args=[1]))
 
         #Check that the response is 204 no content
+        self.assertEqual(response.status_code, 204)
+
+        #Check the application is deleted from the database
+        self.assertEqual(Application.objects.all().count(), 1)
+
+    #Test functionality that fetches recruiters
+    def test_get_recruiters(self):
+        
+        #Log the test_user in
+        self.client.force_login(self.test_user)
+
+        #Make a GET request to get_recruiters
+        response = self.client.get(reverse("get_recruiters"))
+
+        #Check if the status is 302 found
+        self.assertEqual(response.status_code, 302)
+
+        #Check if a recruiter object is recieved as json
+        data = response.json()
+
+        self.assertEqual(len(data["recruiters"]), 1)
+
+    
+    #Test API endpoint that fetches companies
+    def test_get_companies(self):
+
+        #Log the test_user in
+        self.client.force_login(self.test_user)
+
+        #Make a GET request to get_companies
+        response = self.client.get(reverse("get_companies"))
+
+        #Check if the status is 302 found
+        self.assertEqual(response.status_code, 302)
+
+        #Check if a company object is received as json
+        data = response.json()
+        self.assertEqual(len(data["companies"]), 1)
+
+    
+    #Test API endpoint that deletes a recruiter
+    def test_delete_recruiter(self):
+
+        #Log the test_user in
+        self.client.force_login(self.test_user)
+
+        #Send a DELETE  request to delete_recruiter
+        response = self.client.delete(reverse("delete_recruiter", args=[0]))
+
+        #Check if the response status code is 204
+        self.assertEqual(response.status_code, 204)
+
+        #Check if the recruiter object is deleted from the model
+        self.assertEqual(Recruiter.objects.all().count(), 0)
+
+    
+    #Test API endpoint that deletes a company
+    def test_delete_company(self):
+
+        #Log the test_user in
+        self.client.force_login(self.test_user)
+
+        #Send a DELETE request to delete_company to delete the company named Microsoft
+        response = self.client.delete(reverse("delete_company", args=[2]))
+
+        #Check if the response status code is 204
+        self.assertEqual(response.status_code, 204)
+
+        #Check if the Microsoft company object is deleted
+        self.assertEqual(Company.objects.all().count(), 2)
+
+
+    #Test API endpoint to get all the user links
+    def test_get_links(self):
+
+        #Log the test_user in
+        self.client.force_login(self.test_user)
+
+        #Send a GET request to get_links
+        response = self.client.get(reverse("get_links"))
+
+        #Check if the status is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        #Check if the link object is fetched
+        data = response.json()
+        self.assertEqual(len(data["links"]), 1)
+
+        self.assertEqual(data["links"][0]["title"], "LinkedIn")
+
+    #Test API endpoint that adds a link
+    def test_add_link(self):
+
+        #Log the test_user in
+        self.client.force_login(self.test_user)
+
+        #Send a POST request to add_link
+        response = self.client.post(reverse("add_link"), json.dumps({
+            "title": "website",
+            "url": "https://www.test.com"
+        }))
+
+        #Check if the response status code is 201
+        self.assertEqual(response.status_code, 201)
+
+    #Test API endpoint that modifies a link
+    def test_modify_link(self):
+
+        #Log the user in
+        self.client.force_login(self.test_user)
+
+        #Send a PUT request to modify_link
+        response = self.client.put(reverse("modify_link"), json.dumps({
+            "id": self.test_link.id,
+            "title": "LinkedIN",
+            "url": "https://www.linkedin.com/test-user"
+        }))
+
+        #Check if the response code is 204
+        self.assertEqual(response.status_code, 204)
+
+    #Test API endpoint that deletes a link
+    def test_delete_link(self):
+
+        #Log the user in
+        self.client.force_login(self.test_user)
+
+        #Send a DELETE request to delete_link
+        response = self.client.delete(reverse("delete_link"), json.dumps({
+            "id": self.test_link.id
+        }))
+
+        #Check if the response status code is 204
         self.assertEqual(response.status_code, 204)

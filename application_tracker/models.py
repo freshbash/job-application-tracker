@@ -1,21 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-import json
 
 #User model to store all user data
 class User(AbstractUser):
-
-    website_url = models.URLField(blank=True, null=True)
-    linkedin_url = models.URLField(blank=True, null=True)
-    github_url = models.URLField(blank=True, null=True)
-
-    #Return the details above in a JSON format
-    def serialize(self):
-        return json.dumps({
-            "website": self.website_url,
-            "linkedin": self.linkedin_url,
-            "github": self.github_url
-        })
 
     #Returns a string summary of an instance
     def __str__(self) -> str:
@@ -67,11 +54,11 @@ class Application(models.Model):
         default=employment_types[0][0]
     )
 
-    recruiter_name = models.CharField(max_length=64)
+    recruiter_name = models.CharField(max_length=64, blank=True)
     recruiter_email = models.EmailField(blank=True, default="No Email")
     recruiter_linkedin = models.URLField(blank=True, default="No LinkedIn")
-    resume_name = models.CharField(max_length=64)
-    file = models.FileField(upload_to='')
+    resume_name = models.CharField(max_length=64, blank=True, null=True)
+    file = models.FileField(upload_to='', blank=True, null=True)
 
 
 #Model to store company data
@@ -96,8 +83,15 @@ class Analytics(models.Model):
     date = models.DateField(auto_now_add=True)
 
     status_choices = [
+        ("NA", "undetermined")
         ("ACC", "accepted"),
         ("REJ", "rejected")
     ]
 
-    status = models.CharField(max_length=3, blank=True, choices=status_choices, null=True)
+    status = models.CharField(max_length=3, default=status_choices[0][0], choices=status_choices)
+
+#Model to store links to all of the registered users' work
+class Link(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_links")
+    title = models.CharField(max_length=64)
+    url = models.URLField()

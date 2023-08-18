@@ -10,16 +10,25 @@ function_dictionary = {
     "register": user_auth.register,
     "logout": user_auth.logout_user,
     "index": render_templates.index,
-    "get_applications": api.get_applications,
-    "create_application_page": render_templates.create_application_page,
     "create_application": render_templates.create_application,
-    "view_documents": render_templates.view_documents,
     "view_analytics": render_templates.view_analytics,
+    "view_recruiters": render_templates.view_recruiters,
+    "view_companies": render_templates.view_companies,
+    "add_recruiter": render_templates.add_recruiter,
+    "view_profile": render_templates.view_profile,
+    "delete_account": render_templates.delete_account,
+    "get_applications": api.get_applications,
+    "get_recruiters": api.get_recruiters,
+    "get_companies": api.get_companies,
+    "delete_company": api.delete_company,
+    "delete_recruiter": api.delete_recruiter,
     "get_analytics_data": api.get_data,
-    "add_document": render_templates.add_document,
-    "delete_document": api.delete_document,
     "modify_application": api.modify_application,
-    "delete_application": api.delete_application
+    "delete_application": api.delete_application,
+    "get_links": api.get_links,
+    "add_link": api.add_link,
+    "modify_link": api.modify_link,
+    "delete_link": api.delete_link
 }
 
 class TestURLs(TestCase):
